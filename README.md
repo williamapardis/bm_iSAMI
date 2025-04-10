@@ -5,10 +5,10 @@ We are demonstrating integration of Sunburst Sensor’s iSAMI-pH and Sofar Ocean
 
 ![image](https://github.com/user-attachments/assets/d62f8649-4a80-4075-9dbc-c6d842b3e9b2)
 
-# Dependencies
-## Main Protocol
+## Dependencies
+### Main Protocol
 - BM Protocol v2.1.0
   - Repository: https://github.com/organization/bm_protocol
 
-References
+## References
 [1] 
