@@ -20,4 +20,6 @@ We are demonstrating integration of Sunburst Sensor’s iSAMI-pH and Sofar Ocean
 ## Why pH?
 If you were to take a single drop of seawater from the central pacific and compare it to one 30 years ago there would be ~42 billion more hydrogen ions in that single drop. Increased carbon dioxide in our atmosphere reacts with our ocean producing hydrogen ions in solution and perturbing our ocean's fundamental chemistry. How do we conceptualize such large changes in hydrogen ion concentration? The practical answer is pH. pH compresses the wild extremes of hydrogen ion concentration into a tidy, 14-step logarithmic scale.
 
-
+$$
+pH = log_{10}([H^+])
+$$
