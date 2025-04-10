@@ -1,7 +1,7 @@
 # iSAMI Bristlemouth Interface Firmware
 This includes the firmware for the Bristlemouth development kit to interface a Sofar Smart Spotter Mooring with Sunburst Sensor's iSAMI-pH instrument. The frimware functions as follows:
 
-* Bristlemouth Mote triggers a measurement on the iSAMI through the RS232 connection.
+* Bristlemouth Mote triggers a measurement on the iSAMI through the RS232 connection at a specified interval.
 * The iSAMI runs through its measurment sequence (~60s) and transmits its raw hex data through the RS232 connection.
 * This 233 byte hex code is proccessed and a series of calculations lead to the determination of pH.
 * Raw hex data is stored on the Spotter SD card through the Bristlemouth network
