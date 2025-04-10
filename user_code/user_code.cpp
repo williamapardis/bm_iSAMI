@@ -60,6 +60,12 @@ typedef struct {
   int size;
 } RegressionResult;
 
+// Structure to store aggregated statistics from one of our sensors.
+typedef struct {
+  float pH_final;
+  float temp_final;
+ } __attribute__((__packed__)) sensorStatAgg_t;
+
 // structure to hold relavent pH variables
 typedef struct {
   uint32_t time;
@@ -412,6 +418,24 @@ void loop(void) {
         rtcTimeBuffer, record.regression.intercept, record.temperature.ex_temp);
       printf("Read length: %u\n", read_len);  
 
+      // We have 2 sensor channels - humidity and temperature
+      static const uint8_t NUM_SENSORS = 1;
+
+      sensorStatAgg_t report_stats[NUM_SENSORS] = {};
+
+      report_stats[0].pH_final = record.regression.intercept;
+      report_stats[0].temp_final = record.temperature.ex_temp;
+
+      uint8_t tx_data[sizeof(sensorStatAgg_t) * NUM_SENSORS] = {};
+      for (uint8_t i = 0; i < NUM_SENSORS; i++) {
+        memcpy(tx_data + sizeof(sensorStatAgg_t) * i, reinterpret_cast<uint8_t *>(&report_stats[i]), sizeof(sensorStatAgg_t));
+      }
+      if(spotter_tx_data(tx_data, sizeof(sensorStatAgg_t) * NUM_SENSORS, BM_NETWORK_TYPE_CELLULAR_IRI_FALLBACK)){
+        printf("%llut - %s | Successfully sent Spotter transmit data request\n", uptimeGetMs(), rtcTimeBuffer);
+      }
+      else {
+        printf("%llut - %s | ERR Failed to send Spotter transmit data request!\n", uptimeGetMs(), rtcTimeBuffer);
+      }
     }else{
       // Print the payload data to a file, to the bm_printf console, and to the printf console.
       bm_fprintf(0, "payload_data.log", "tick: %llu, rtc: %s, line: %.*s\n",
@@ -440,7 +464,7 @@ void loop(void) {
     write_timer = uptimeGetMs();
   }
 
-  if (write_timer + 2000 < uptimeGetMs()) {
+  if (write_timer + 9999999 < uptimeGetMs()) {
     char payload[2048]=":1A4E70AE41361D619EA157828870FC42A25158728810FE52A2A156A288C0FBC2A24156C287B0FBA2A20156824FB0FC6293B157C1A430FE5265715840F020FDB21DF157109FD0FCF1EF6155B090D0FC01E3B15690A600FBD1EFE15680CF70FB82081157C10400FC12215157E13C50FEA23BD156817540FBA251815781A820FC1264915771D0F0FB2270815621F780FD227C6157E21990FD42867158123380FBB28D5156C24750FCD292C156A25560FBC2961157825F60FBB29791587267A0FBD2993155226DB0FB529AB158627300FC729C8155727770FBD29D7157A27B20FBD29E419E13C7619CD8D";
     int read_len = sizeof(payload)/sizeof(payload[0]);
     pH(payload); 
