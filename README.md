@@ -13,9 +13,9 @@ This includes the firmware for the Bristlemouth development kit to interface a S
   - Repository: https://github.com/organization/bm_protocol
 
 ## Wiring of the iSAMI-pH to the Bristlemouth Dev Kit
-| Image 1 | Image 2 |
+| Pin to Pin Discription | Example Image of termination |
 |---------|---------|
-| ![image](https://github.com/user-attachments/assets/a3373db4-f852-441c-897a-7897e9fd516c)| !![image](https://github.com/user-attachments/assets/cf0f40a9-959e-4d1d-a3bc-410f79f716c6)|
+| ![image](https://github.com/user-attachments/assets/a3373db4-f852-441c-897a-7897e9fd516c)| ![image](https://github.com/user-attachments/assets/cf0f40a9-959e-4d1d-a3bc-410f79f716c6)|
 
 
 # The Project
