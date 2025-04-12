@@ -13,24 +13,9 @@ This includes the firmware for the Bristlemouth development kit to interface a S
   - Repository: https://github.com/organization/bm_protocol
 
 ## Wiring of the iSAMI-pH to the Bristlemouth Dev Kit
-&lt;!-- Using HTML table --&gt;
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;td&gt;&lt;img src="https://github.com/user-attachments/assets/9dcf4636-109e-4908-a345-b4daaed2cb25" width="300px"&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;img src="https://github.com/user-attachments/assets/0fa48820-d3a2-4d40-b1dc-a082144f96fe" width="300px"&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/table&gt;
-
-&lt;!-- Using HTML div with inline CSS --&gt;
-&lt;div style="display: flex;"&gt;
-  &lt;img src="https://github.com/user-attachments/assets/9dcf4636-109e-4908-a345-b4daaed2cb25" width="300px"&gt;
-  &lt;img src="https://github.com/user-attachments/assets/0fa48820-d3a2-4d40-b1dc-a082144f96fe" width="300px"&gt;
-&lt;/div&gt;
-
-&lt;!-- Using HTML img tags with align --&gt;
-&lt;img src="https://github.com/user-attachments/assets/9dcf4636-109e-4908-a345-b4daaed2cb25" width="300px" align="left"&gt;
-&lt;img src="https://github.com/user-attachments/assets/0fa48820-d3a2-4d40-b1dc-a082144f96fe" width="300px" align="left"&gt;
-
+| Image 1 | Image 2 |
+|---------|---------|
+| ![image](https://github.com/user-attachments/assets/a3373db4-f852-441c-897a-7897e9fd516c)| !![image](https://github.com/user-attachments/assets/cf0f40a9-959e-4d1d-a3bc-410f79f716c6)|
 
 
 # The Project
