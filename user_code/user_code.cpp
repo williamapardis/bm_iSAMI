@@ -20,10 +20,15 @@
 #include <math.h>
 
 #define LED_ON_TIME_MS 20
-#define LED_PERIOD_MS 250 // Changed to 10 seconds
+#define LED_PERIOD_MS 500 // Changed to 10 seconds
 #define DEFAULT_BAUD_RATE 57600
 #define DEFAULT_LINE_TERM 13 // FL / '\n', 0x0A
 #define BYTES_CLUSTER_MS 50
+
+// How often, in minutes, we want to compute stats.
+#define DEFAULT_SENSOR_PERIOD_MIN (15) // let's start with 30s for quick testing
+// Converted to milliseconds.
+#define SENSOR_PERIOD_MS (int)((double)DEFAULT_SENSOR_PERIOD_MIN * 60.0 * 1000.0)
 
 // app_main passes a handle to the user config partition in NVM.
 extern cfg::Configuration *userConfigurationPartition;
@@ -33,7 +38,7 @@ static int32_t ledLinePulse = -1;
 static u_int32_t baud_rate_config = DEFAULT_BAUD_RATE;
 static u_int32_t line_term_config = DEFAULT_LINE_TERM;
 static bool waiting_for_response = false;
-static uint32_t write_timer = -105000;
+static uint32_t write_timer = -SENSOR_PERIOD_MS;
 
 //iSAMI Abs Coef. constants for instruments made after June 2024; 
 double ea434 = 19038;
@@ -69,7 +74,7 @@ typedef struct {
 // structure to hold relavent pH variables
 typedef struct {
   uint32_t time;
-  double Salinity = 35;
+  double Salinity = 28;
   Temperature temperature;
   double A434_blank;
   double A578_blank;
@@ -86,8 +91,8 @@ pH_Record record;
 //}
 
 double steinhartHart(int voltage, double A, double B, double C, double D){
-  double Rt1 = ((double)voltage / (16384 - voltage)) * 17400;	 // Rt1=17400 * temp/(maxVoltage-temp) # this in external temperature at start for SAMI, this equation is not valid for internal temperature (iSAMI0
-  double InvT1 = A + B * (log(Rt1)) + C * pow(log(Rt1),2) + D * pow(log(Rt1),3);
+  double Rt = ((double)voltage / (16384 - voltage)) * 17400;	 // Rt1=17400 * temp/(maxVoltage-temp) # this in external temperature at start for SAMI, this equation is not valid for internal temperature (iSAMI0
+  double InvT1 = A + B * (log(Rt)) + C * pow(log(Rt),2) + D * pow(log(Rt),3);
   double TempK1 = 1 / InvT1;
   double TempC1 = TempK1 - 273.15;
   //TempC1 = TempC1 + tempOffset
@@ -117,7 +122,7 @@ void calcTemperatures(char arr[]){
   }
 
   record.temperature.start_ex_temp = steinhartHart(bits[0], 0.0010183, 0.000241, 0, 0.00000015);
-  record.temperature.in_temp= steinhartHart(bits[1], 0.0010183, 0.000241, 0, 0.00000015);//0.0033540154, 0.00025627725, 0.0000020829210, 0.000000073003206);
+  record.temperature.in_temp= steinhartHart(bits[1], 0.0010183, 0.000241, 0, 0.00000015);
   record.temperature.end_ex_temp = steinhartHart(bits[2], 0.0010183, 0.000241, 0, 0.00000015);
 
   record.temperature.ex_temp = (record.temperature.start_ex_temp + record.temperature.end_ex_temp) / 2;
@@ -347,8 +352,22 @@ void setup(void) {
   bristlefin.enableVout();
 }
 
+//Spoofer usually run from the LED1 blinker for testing data manipulating functions
+void spoofer(){
+  char payload[2048]=":1A4E70AE41361D619EA157828870FC42A25158728810FE52A2A156A288C0FBC2A24156C287B0FBA2A20156824FB0FC6293B157C1A430FE5265715840F020FDB21DF157109FD0FCF1EF6155B090D0FC01E3B15690A600FBD1EFE15680CF70FB82081157C10400FC12215157E13C50FEA23BD156817540FBA251815781A820FC1264915771D0F0FB2270815621F780FD227C6157E21990FD42867158123380FBB28D5156C24750FCD292C156A25560FBC2961157825F60FBB29791587267A0FBD2993155226DB0FB529AB158627300FC729C8155727770FBD29D7157A27B20FBD29E419E13C7619CD8D";
+  int read_len = sizeof(payload)/sizeof(payload[0]);
+  pH(payload); 
+  printf("[iSAMI] | tick: %llu, pH: %f, T: %f\n", uptimeGetMs(), record.regression.intercept, record.temperature.ex_temp);
+  printf("Read length: %u\n", read_len);
+
+  write_timer = uptimeGetMs();
+}
+
 void loop(void) {
   /* USER LOOP CODE GOES HERE */
+
+  
+
   static bool led2State = false;
   /// This checks for a trigger set by ledLinePulse when data is received from the payload UART.
   ///   Each time this happens, we pulse LED2 Green.
@@ -379,6 +398,7 @@ void loop(void) {
     ledOnTimer = uptimeGetMs();
     ledPulseTimer += LED_PERIOD_MS;
     led1State = true;
+    //spoofer();
   }
   // If LED1 has been on for LED_ON_TIME_MS milliseconds, turn it off.
   else if (led1State &&
@@ -387,6 +407,15 @@ void loop(void) {
     led1State = false;
   }
 
+  if (write_timer + SENSOR_PERIOD_MS < uptimeGetMs()) {
+    waiting_for_response = true;
+    const char command[] = "R 5A 0\r";
+    //uint8_t data[] = {0x52, 0x20, 0x35, 0x41, 0x0D};
+    printf("Writing: %s to the sensor!\n", command);
+    PLUART::write((uint8_t *)command, strlen(command));
+    printf("Done writing!\n");
+    write_timer = uptimeGetMs();
+  }
 
   // // -- A timer is used to try to keep clusters of bytes (say from lines) in the same output.
   static int64_t readingBytesTimer = -1;
@@ -423,8 +452,8 @@ void loop(void) {
 
       sensorStatAgg_t report_stats[NUM_SENSORS] = {};
 
-      report_stats[0].pH_final = record.regression.intercept;
-      report_stats[0].temp_final = record.temperature.ex_temp;
+      report_stats[0].pH_final = round(record.regression.intercept * 10000) / 10000; 
+      report_stats[0].temp_final = round(record.temperature.ex_temp * 10000) / 10000; 
 
       uint8_t tx_data[sizeof(sensorStatAgg_t) * NUM_SENSORS] = {};
       for (uint8_t i = 0; i < NUM_SENSORS; i++) {
@@ -450,51 +479,6 @@ void loop(void) {
     ledLinePulse = uptimeGetMs(); // trigger a pulse on LED2
     waiting_for_response = false;
 
-    
-    
   }
  
-  if (write_timer + 120000 < uptimeGetMs()) {
-    waiting_for_response = true;
-    const char command[] = "R 5A 0\r";
-    //uint8_t data[] = {0x52, 0x20, 0x35, 0x41, 0x0D};
-    printf("Writing: %s to the sensor!\n", command);
-    PLUART::write((uint8_t *)command, strlen(command));
-    printf("Done writing!\n");
-    write_timer = uptimeGetMs();
-  }
-
-  if (write_timer + 9999999 < uptimeGetMs()) {
-    char payload[2048]=":1A4E70AE41361D619EA157828870FC42A25158728810FE52A2A156A288C0FBC2A24156C287B0FBA2A20156824FB0FC6293B157C1A430FE5265715840F020FDB21DF157109FD0FCF1EF6155B090D0FC01E3B15690A600FBD1EFE15680CF70FB82081157C10400FC12215157E13C50FEA23BD156817540FBA251815781A820FC1264915771D0F0FB2270815621F780FD227C6157E21990FD42867158123380FBB28D5156C24750FCD292C156A25560FBC2961157825F60FBB29791587267A0FBD2993155226DB0FB529AB158627300FC729C8155727770FBD29D7157A27B20FBD29E419E13C7619CD8D";
-    int read_len = sizeof(payload)/sizeof(payload[0]);
-    pH(payload); 
-    printf("[iSAMI] | tick: %llu, pH: %f, T: %f\n", uptimeGetMs(), record.regression.intercept, record.temperature.ex_temp);
-    printf("Read length: %u\n", read_len);
-  //   printf("[payload-line] | line: %s\n", payload);
-    
-  //   //int index_array[] = {8, 16, 20, 84, 452, 456, 460, 464};
-  //   //int length_array[] = {8, 4, 64, 368, 4, 4, 4, 2};
-
-  //   //int size_array = sizeof(index_array)/sizeof(index_array[0]);
-
-  //   //getHex(payload,index_array,length_array,size_array);
-  //   calcTemperatures(payload);
-
-  //   printf("[Temperature] | Start: %f, Int: %f, End: %f\n", record.start_therm, record.int_therm, record.end_therm);
-    
-  //   blank(payload);
-    
-  //   printf("[Blank Abs] | Blank 434: %f, Blank 578: %f\n", record.A434_blank, record.A578_blank);
-
-  //   reagent(payload);
-    
-  //   // int lengt=sizeof(record.A434_reagent)/sizeof(record.A434_reagent[0]);
-  //   // for(int i = 0; i < lengt; i++){
-  //   //   printf("[Reagent Abs] | 434: %f, 578: %f\n", record.A434_reagent[i], record.A578_reagent[i]);
-  //   // }
-
-  //   pH();
-
-    write_timer = uptimeGetMs();
-  }
 }
