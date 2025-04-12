@@ -13,23 +13,23 @@ This includes the firmware for the Bristlemouth development kit to interface a S
   - Repository: https://github.com/organization/bm_protocol
 
 ## Wiring of the iSAMI-pH to the Bristlemouth Dev Kit
-<table>
-  <tr>
-    <th>Header 1</th>
-    <th>Header 2</th>
-    <th>Header 3</th>
-  </tr>
-  <tr>
-    <td>![image](https://github.com/user-attachments/assets/9dcf4636-109e-4908-a345-b4daaed2cb25)</td>
-    <td>![image](https://github.com/user-attachments/assets/0fa48820-d3a2-4d40-b1dc-a082144f96fe)</td>
-    <td>Cell 3</td>
-  </tr>
-  <tr>
-    <td>Cell 4</td>
-    <td>Cell 5</td>
-    <td>Cell 6</td>
-  </tr>
-</table>
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Header 1&lt;/th&gt;
+    &lt;th&gt;Header 2&lt;/th&gt;
+    &lt;th&gt;Header 3&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;img src="https://github.com/user-attachments/assets/9dcf4636-109e-4908-a345-b4daaed2cb25" width="300px"&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;img src="https://github.com/user-attachments/assets/0fa48820-d3a2-4d40-b1dc-a082144f96fe" width="300px"&gt;&lt;/td&gt;
+    &lt;td&gt;Cell 3&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Cell 4&lt;/td&gt;
+    &lt;td&gt;Cell 5&lt;/td&gt;
+    &lt;td&gt;Cell 6&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
 
 
 
