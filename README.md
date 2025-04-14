@@ -27,7 +27,9 @@ This is the integration and deomonstraition of Sunburst Sensor’s iSAMI-pH and 
 ## How does the iSAMI-pH work?
 Most people are familiar with litmus paper—strips containing pH-sensitive dye that change color when exposed to different solutions. The iSAMI-pH is essentially an automated version of litmus paper, but instead of visual observation, it mixes liquid dye with seawater and analyzes the color change using precise embedded optical electronics. We would call this a spectrophotometric pH method: spectro - (color), photo - (light), metric - (measuring). Here is the dye (m-Cresol Purple) in action:
 
-<img src="https://github.com/user-attachments/assets/d657caad-3810-43e3-91d2-ba19436170aa" width="300">
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/d657caad-3810-43e3-91d2-ba19436170aa" width="300">
+</p>
 
 The advantage of spectrophotometric pH is that, rather than taking a calibrated approach like electrodes, it directly measures hydrogen ions in solution. measure of hydrogen ions in solution. This calibration free method consequently has very low drift, allowing these sensors to dwell for years while maintaining their accuracy.
 Thanks to the exacting work of analytical chemists, this dye’s physical properties have been scrutinized in the seawater matrix, making it highly accurate. It is considered the gold standard for quantitative oceanographic pH measurement.
