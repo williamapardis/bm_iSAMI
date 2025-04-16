@@ -7,10 +7,23 @@ This includes the firmware for the Bristlemouth development kit to interface a S
 * Raw hex data is stored on the Spotter SD card through the Bristlemouth network
 * pH and external temperature are stored on the Spotter SD and transmitted over the cellular modem.
 
+Check out the project on the [forum](https://bristlemouth.discourse.group/t/turn-key-coastal-ph-monitoring-with-spotter-bristlemouth-and-sunburst-sensor-s-isami-ph/489?u=wpardis).
+
 ## Dependencies
 ### Main Protocol
 - BM Protocol v2.1.0
   - Repository: https://github.com/organization/bm_protocol
+ 
+## To Program Your Mote
+In your command line
+'''
+git clone https://github.com/organization/bm_protocol
+'''
+Navigate to the the Dev. kit application directory
+'''
+git clone 
+
+'''
 
 ## Wiring of the iSAMI-pH to the Bristlemouth Dev Kit
 Please note that I have secured the development board to the oposite endcap it comes pre installed on with the Dev. Kit. This lets us utilize the 2P Molex Microfit interconnect for assembly of the pressure vessel, rather than adding our own.
