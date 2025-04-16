@@ -16,13 +16,13 @@ Check out the project on the [forum](https://bristlemouth.discourse.group/t/turn
  
 ## To Program Your Mote
 In your command line
-'''bash
+```bash
 git clone https://github.com/organization/bm_protocol
-'''
+```
 Navigate to the the Dev. kit application directory
-'''bash
+```bash
 git clone https://github.com/williamapardis/bm_iSAMI.git
-'''
+```
 
 ## Wiring of the iSAMI-pH to the Bristlemouth Dev Kit
 Please note that I have secured the development board to the oposite endcap it comes pre installed on with the Dev. Kit. This lets us utilize the 2P Molex Microfit interconnect for assembly of the pressure vessel, rather than adding our own.
