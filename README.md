@@ -23,6 +23,9 @@ Navigate to the the Dev. kit application directory
 ```bash
 git clone https://github.com/williamapardis/bm_iSAMI.git
 ```
+```bash
+cmake ../.. -DCMAKE_TOOLCHAIN_FILE=../../cmake/arm-none-eabi-gcc.cmake -DBSP=bm_mote_v1.0 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_APP_TYPE=BMDK -DAPP=bm_iSAMI
+```
 
 ## Wiring of the iSAMI-pH to the Bristlemouth Dev Kit
 Please note that I have secured the development board to the oposite endcap it comes pre installed on with the Dev. Kit. This lets us utilize the 2P Molex Microfit interconnect for assembly of the pressure vessel, rather than adding our own.
