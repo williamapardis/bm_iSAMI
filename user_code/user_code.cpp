@@ -20,7 +20,7 @@
 #include <math.h>
 
 #define LED_ON_TIME_MS 20
-#define LED_PERIOD_MS 500 // Changed to 10 seconds
+#define LED_PERIOD_MS 1000 // LED Period
 #define DEFAULT_BAUD_RATE 57600
 #define DEFAULT_LINE_TERM 13 // FL / '\n', 0x0A
 #define BYTES_CLUSTER_MS 50
@@ -81,6 +81,7 @@ typedef struct {
   double A434_reagent[23];  //these values have their respective blank subtracted
   double A578_reagent[23];
   RegressionResult regression;  // nested linear regression struct for indicator purturb. results
+  double pH_final;              // final pH from regression interp. includes temp. compensation
   uint16_t battery;
   uint8_t checksum;
 } pH_Record;
@@ -270,7 +271,7 @@ void pH(char arr[]){
 
   // // Absorptivity Coef. Calculations
   // acid dissociation constant
-  double T_C = record.temperature.ex_temp;
+  double T_C = record.temperature.in_temp;
   double T_K = T_C + 273.15;
   double pKa = -241.462 + 0.6375 + (7085.72 / T_K) + 43.8332 * log(T_K) - 0.0806406 * T_K - 0.3238 * pow(record.Salinity, 0.5) + 0.0807 * record.Salinity - 0.01157 * pow(record.Salinity, 1.5) + 0.000694 * pow(record.Salinity, 2); 
 	
@@ -318,6 +319,7 @@ void pH(char arr[]){
     
   record.regression = result;
 
+  record.pH_final = record.regression.intercept- 0.015 * (record.temperature.ex_temp - record.temperature.in_temp);
 
 }
 
@@ -356,7 +358,7 @@ void spoofer(){
   char payload[2048]=":1A4E70AE41361D619EA157828870FC42A25158728810FE52A2A156A288C0FBC2A24156C287B0FBA2A20156824FB0FC6293B157C1A430FE5265715840F020FDB21DF157109FD0FCF1EF6155B090D0FC01E3B15690A600FBD1EFE15680CF70FB82081157C10400FC12215157E13C50FEA23BD156817540FBA251815781A820FC1264915771D0F0FB2270815621F780FD227C6157E21990FD42867158123380FBB28D5156C24750FCD292C156A25560FBC2961157825F60FBB29791587267A0FBD2993155226DB0FB529AB158627300FC729C8155727770FBD29D7157A27B20FBD29E419E13C7619CD8D";
   int read_len = sizeof(payload)/sizeof(payload[0]);
   pH(payload); 
-  printf("[iSAMI] | tick: %llu, pH: %f, T: %f\n", uptimeGetMs(), record.regression.intercept, record.temperature.ex_temp);
+  printf("[iSAMI] | tick: %llu, pH: %f, T: %f\n", uptimeGetMs(), record.pH_final, record.temperature.ex_temp);
   printf("Read length: %u\n", read_len);
 
   write_timer = uptimeGetMs();
@@ -395,7 +397,7 @@ void loop(void) {
     ledOnTimer = uptimeGetMs();
     ledPulseTimer += LED_PERIOD_MS;
     led1State = true;
-    //spoofer();
+    spoofer();
   }
   // If LED1 has been on for LED_ON_TIME_MS milliseconds, turn it off.
   else if (led1State &&
@@ -437,11 +439,11 @@ void loop(void) {
       pH(payload_buffer);
       // Print the payload data to a file, to the bm_printf console, and to the printf console.
       bm_fprintf(0, "iSAMI_data.log", "tick: %llu, rtc: %s, pH: %f, T: %f\n",
-        uptimeGetMs(), rtcTimeBuffer, record.regression.intercept, record.temperature.ex_temp);
+        uptimeGetMs(), rtcTimeBuffer, record.pH_final, record.temperature.ex_temp);
       bm_printf(0, "[iSAMI] | tick: %llu, rtc: %s, pH: %f, T: %f", uptimeGetMs(),
-        rtcTimeBuffer, record.regression.intercept, record.temperature.ex_temp);
+        rtcTimeBuffer, record.pH_final, record.temperature.ex_temp);
       printf("[iSAMI] | tick: %llu, rtc: %s, pH: %f, T: %f\n", uptimeGetMs(),
-        rtcTimeBuffer, record.regression.intercept, record.temperature.ex_temp);
+        rtcTimeBuffer, record.pH_final, record.temperature.ex_temp);
       printf("Read length: %u\n", read_len);  
 
       // We have 2 sensor channels - humidity and temperature
@@ -449,8 +451,8 @@ void loop(void) {
 
       sensorStatAgg_t report_stats[NUM_SENSORS] = {};
 
-      report_stats[0].pH_final = round(record.regression.intercept * 10000) / 10000; 
-      report_stats[0].temp_final = round(record.temperature.ex_temp * 10000) / 10000; 
+      report_stats[0].pH_final = round(record.pH_final * 10000) / 10000; 
+      report_stats[0].temp_final = round(record.pH_final * 10000) / 10000; 
 
       uint8_t tx_data[sizeof(sensorStatAgg_t) * NUM_SENSORS] = {};
       for (uint8_t i = 0; i < NUM_SENSORS; i++) {
