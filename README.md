@@ -12,12 +12,12 @@ Check out the project on the [forum](https://bristlemouth.discourse.group/t/turn
 ## Dependencies
 ### Main Protocol
 - BM Protocol v2.1.0
-  - Repository: https://github.com/organization/bm_protocol
+  - Repository: https://github.com/bristlemouth/bm_protocol.git
  
 ## To Program Your Mote
 In your command line
 ```bash
-git clone https://github.com/organization/bm_protocol
+git clone https://github.com/bristlemouth/bm_protocol.git
 ```
 Navigate to the the Dev. kit application directory
 ```bash
