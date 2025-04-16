@@ -16,13 +16,12 @@ Check out the project on the [forum](https://bristlemouth.discourse.group/t/turn
  
 ## To Program Your Mote
 In your command line
-'''
+'''bash
 git clone https://github.com/organization/bm_protocol
 '''
 Navigate to the the Dev. kit application directory
-'''
-git clone 
-
+'''bash
+git clone https://github.com/williamapardis/bm_iSAMI.git
 '''
 
 ## Wiring of the iSAMI-pH to the Bristlemouth Dev Kit
