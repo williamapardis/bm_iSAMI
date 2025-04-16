@@ -15,7 +15,7 @@ Check out the project on the [forum](https://bristlemouth.discourse.group/t/turn
   - Repository: https://github.com/bristlemouth/bm_protocol.git
  
 ## To Program Your Mote
-In your command line
+Clone BM Protocol
 ```bash
 git clone https://github.com/bristlemouth/bm_protocol.git
 ```
