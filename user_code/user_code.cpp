@@ -90,18 +90,16 @@ pH_Record record;
   
 //}
 
-double steinhartHart(int voltage, double A, double B, double C, double D){
-  double Rt = ((double)voltage / (16384 - voltage)) * 17400;	 // Rt1=17400 * temp/(maxVoltage-temp) # this in external temperature at start for SAMI, this equation is not valid for internal temperature (iSAMI0
-  double InvT1 = A + B * (log(Rt)) + C * pow(log(Rt),2) + D * pow(log(Rt),3);
-  double TempK1 = 1 / InvT1;
-  double TempC1 = TempK1 - 273.15;
-  //TempC1 = TempC1 + tempOffset
-  //TempFinal = TempC1
-  //printf("%f\n", Rt1);      // prints: 3.141590
-  //printf("%f\n", InvT1);
-  //printf("%f\n", TempK1);
-  //printf("%f\n\n", TempC1);
-  return TempC1;
+double steinhartHart(double voltage, double A, double B, double C, double D){
+  double Rt = (voltage / (16384 - voltage)) * 17400;	 // Rt1=17400 * temp/(maxVoltage-temp) # this in external temperature at start for SAMI, this equation is not valid for internal temperature (iSAMI0
+  double InvT = A + B * (log(Rt)) + C * pow(log(Rt),2) + D * pow(log(Rt),3);
+  double TempK = 1 / InvT;
+  double TempC = TempK - 273.15;
+  //printf("%f\n", Rt);      
+  //printf("%f\n", InvT);
+  //printf("%f\n", TempK);
+  //printf("%f\n\n", TempC);
+  return TempC;
 }
 
 void calcTemperatures(char arr[]){
@@ -121,9 +119,10 @@ void calcTemperatures(char arr[]){
     //printf("[individual] | tempBits: %s\n", subsection);
   }
 
-  record.temperature.start_ex_temp = steinhartHart(bits[0], 0.0010183, 0.000241, 0, 0.00000015);
-  record.temperature.in_temp= steinhartHart(bits[1], 0.0010183, 0.000241, 0, 0.00000015);
-  record.temperature.end_ex_temp = steinhartHart(bits[2], 0.0010183, 0.000241, 0, 0.00000015);
+  // note internal thermistor is calculated a bit differently per the datasheet, you must devide by the R at 25C (10k)
+  record.temperature.start_ex_temp = steinhartHart((double)bits[0], 0.0010183, 0.000241, 0, 0.00000015);
+  record.temperature.in_temp = steinhartHart((double)bits[1]/10000, 0.0033540154, 0.00025627725, 0.0000020829210, 0.000000073003206);
+  record.temperature.end_ex_temp = steinhartHart((double)bits[2], 0.0010183, 0.000241, 0, 0.00000015);
 
   record.temperature.ex_temp = (record.temperature.start_ex_temp + record.temperature.end_ex_temp) / 2;
 }
@@ -365,8 +364,6 @@ void spoofer(){
 
 void loop(void) {
   /* USER LOOP CODE GOES HERE */
-
-  
 
   static bool led2State = false;
   /// This checks for a trigger set by ledLinePulse when data is received from the payload UART.
