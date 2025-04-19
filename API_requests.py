@@ -60,6 +60,11 @@ df = pd.DataFrame(structured_data['measurements'])
 # Create figure and axis objects with a single subplot
 fig, ax1 = plt.subplots(figsize=(10, 6))
 
+
+df = df.iloc[1:]  # Remove first row
+
+
+
 # Plot pH on primary y-axis
 color = 'tab:blue'
 ax1.set_xlabel('Time')
@@ -71,6 +76,7 @@ ax1.tick_params(axis='y', labelcolor=color)
 ax2 = ax1.twinx()
 color = 'tab:red'
 ax2.set_ylabel('Temperature (°C)', color=color)
+
 ax2.plot(df['timestamp'], df['temperature'], color=color)
 ax2.tick_params(axis='y', labelcolor=color)
 
@@ -84,4 +90,4 @@ for measurement in structured_data['measurements']:
     print(f"\nTimestamp: {measurement['timestamp']}")
     print(f"Location: ({measurement['latitude']}, {measurement['longitude']})")
     print(f"pH: {measurement['pH']:.3f}")
-    print(f"Temperature: {measurement['temperature']:.3f}°C")
+    print(f"Temperature: {measurement['temperature']:.2f}°C")
